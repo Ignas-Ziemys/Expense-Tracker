@@ -1,0 +1,42 @@
+# ===== JAVA / MAVEN =====
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+.mvn/wrapper/maven-wrapper.jar
+
+# ===== SPRING BOOT =====
+application-local.properties
+application-secret.properties
+
+# ===== NODE / REACT =====
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+.env
+.env.local
+.env.*.local
+
+# ===== BUILD OUTPUTS =====
+build/
+out/
+
+# ===== IDE FILES =====
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.swp
+*.swo
+
+# ===== OS FILES =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== DATA FILES =====
+expenses.csv
