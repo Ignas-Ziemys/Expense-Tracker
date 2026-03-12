@@ -9,11 +9,11 @@ public class Expense {
     private String title;
     private Category category;
 
-    public Expense(long id, double amount, Category category, LocalDate date, String note) {
+    public Expense(long id, double amount, Category category, LocalDate date, String title) {
         this.id = id;
         this.amount = amount;
         this.date = date;
-        this.title = note;
+        this.title = title;
         this.category = category;
     }
     public Expense()
