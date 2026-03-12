@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "./api";
+import CategoryOfThisMonthPieChart from "./CategoryOfThisMonthPieChart.jsx";
 
 export default function ManageExpenses() {
     const [expenses, setExpenses] = useState([]);
@@ -23,20 +24,43 @@ export default function ManageExpenses() {
         } catch (err) {
             console.error(err);
         }
-
-        API.delete(`/expenses/${id}`)
-            .then(() => setExpenses(prev => prev.filter(e => e.id !== id)))
-            .catch(err => console.error(err));
     };
 
     return (
-        <div style={{ maxWidth: "500px", margin: "0 auto" }}>
+
+        <div>
             <h1>Manage Expenses</h1>
-            {expenses.length === 0 && <p>No expenses yet.</p>}
+            <h2>This month's expenses:</h2>
+            <CategoryOfThisMonthPieChart />
+
+            {expenses.length === 0 && <p style={{ color: "#888" }}>No expenses yet.</p>}
             {expenses.map(exp => (
-                <div key={exp.id} style={{ borderBottom: "1px solid #ccc", padding: "5px 0" }}>
-                    {exp.title} | ${exp.amount} | {exp.category} | {exp.date}
-                    <button style={{ marginLeft: "10px" }} onClick={() => deleteExpense(exp.id)}>❌ Remove</button>
+                <div key={exp.id} style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "12px 16px",
+                    marginBottom: "8px",
+                    borderRadius: "10px",
+                    backgroundColor: "#1e1e1e",
+                    border: "1px solid #333"
+                }}>
+                    <div>
+                        <p style={{ margin: 0, fontWeight: "500", fontSize: "15px", color: "white" }}>{exp.title}</p>
+                        <p style={{ margin: 0, fontSize: "12px", color: "#888" }}>{exp.category} · {exp.date}</p>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                        <span style={{ fontWeight: "600", fontSize: "16px", color: "#e05a5a" }}>-${exp.amount}</span>
+                        <button onClick={() => deleteExpense(exp.id)} style={{
+                            background: "none",
+                            border: "1px solid #555",
+                            borderRadius: "6px",
+                            color: "#e05a5a",
+                            cursor: "pointer",
+                            padding: "4px 8px",
+                            fontSize: "12px",
+                        }}>Remove</button>
+                    </div>
                 </div>
             ))}
         </div>

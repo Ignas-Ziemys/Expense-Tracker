@@ -9,7 +9,6 @@ function App() {
                 <Link to="/" style={{ marginRight: "10px" }}>Home</Link>
                 <Link to="/manage">Manage Expenses</Link>
             </nav>
-
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/manage" element={<ManageExpenses />} />
