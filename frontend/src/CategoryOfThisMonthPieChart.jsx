@@ -23,22 +23,24 @@ export default function CategoryOfThisMonthPieChart() {
             });
     }, [])
     return (
-        <PieChart width={600} height={450}>
-            <Pie
-                data = {expenses}
-                dataKey="value"
-                nameKey="name"
-                cx={200}
-                cy={200}
-                outerRadius={150}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-            >
-                {expenses.map((_, index) => (
-                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-        </PieChart>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+            <PieChart width={650} height={400}>
+                <Pie
+                    data={expenses}
+                    dataKey="value"
+                    nameKey="name"
+                    cx={300}
+                    cy={180}
+                    outerRadius={150}
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                >
+                    {expenses.map((_, index) => (
+                        <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+            </PieChart>
+        </div>
     );
 }

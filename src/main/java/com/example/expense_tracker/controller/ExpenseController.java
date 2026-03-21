@@ -3,6 +3,7 @@ package com.example.expense_tracker.controller;
 import com.example.expense_tracker.model.Category;
 import com.example.expense_tracker.model.Expense;
 import com.example.expense_tracker.service.ExpenseManager;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.YearMonth;
@@ -24,7 +25,7 @@ public class ExpenseController {
     }
 
     @PostMapping
-    public Expense addExpense(@RequestBody Expense expense) {
+    public Expense addExpense(@Valid @RequestBody Expense expense) {
         System.out.println("Received expense: " + expense.getTitle());
         System.out.println(expense);
         return expenseManager.addExpense(expense);
@@ -56,6 +57,10 @@ public class ExpenseController {
     @GetMapping("/search")
     public List<Expense> searchExpenses(@RequestParam String name) {
         return expenseManager.searchByName(name);
+    }
+    @PutMapping("/{id}")
+    public Expense updateExpense(@PathVariable Long id, @Valid @RequestBody Expense expense) {
+        return expenseManager.editExpense(id, expense.getAmount(), expense.getCategory(), expense.getDate(), expense.getTitle());
     }
 
 }
