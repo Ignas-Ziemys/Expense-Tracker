@@ -1,9 +1,13 @@
 package com.example.expense_tracker.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 
@@ -11,13 +15,17 @@ import java.time.LocalDate;
 public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
+    @Positive
     private double amount;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @NotNull
     private LocalDate date;
+    @NotBlank
     private String title;
     private Category category;
 
-    public Expense(long id, double amount, Category category, LocalDate date, String title) {
+    public Expense(Long id, double amount, Category category, LocalDate date, String title) {
         this.id = id;
         this.amount = amount;
         this.date = date;
@@ -28,7 +36,7 @@ public class Expense {
     {
 
     }
-    public long getId() {
+    public Long getId() {
         return id;
     }
     public void setId(long id) {

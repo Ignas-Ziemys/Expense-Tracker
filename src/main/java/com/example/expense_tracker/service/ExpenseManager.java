@@ -5,6 +5,7 @@ import com.example.expense_tracker.util.FileHandler;
 import com.example.expense_tracker.model.Category;
 import com.example.expense_tracker.model.Expense;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,18 +47,20 @@ public class ExpenseManager {
         }
         return result;
     }
-    public boolean updateExpense(int id, double amount, Category category, String description) {
+    public Expense editExpense(Long id, double amount, Category category, LocalDate date, String title) {
         boolean result = false;
         for (Expense expense : expenseList) {
             if (expense.getId() == id) {
                 expense.setId(id);
                 expense.setAmount(amount);
                 expense.setCategory(category);
-                expense.setTitle(description);
-                result = true;
+                expense.setTitle(title);
+                expense.setDate(date);
+                fileHandler.saveExpenses(expenseList);
+                return expense;
             }
         }
-        return result;
+        return null;
     }
     public List<Expense> getAllExpenses() {
         List<Expense> returnList = new ArrayList<>();
