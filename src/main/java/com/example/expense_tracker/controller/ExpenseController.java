@@ -53,5 +53,9 @@ public class ExpenseController {
     public List<Expense> getExpensesByCategory(@PathVariable Category category) {
         return expenseManager.getExpenseBYCategory(category);
     }
+    @GetMapping("/search")
+    public List<Expense> searchExpenses(@RequestParam String name) {
+        return expenseManager.searchByName(name);
+    }
 
 }

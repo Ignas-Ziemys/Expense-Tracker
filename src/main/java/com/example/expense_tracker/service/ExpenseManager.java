@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpenseManager {
@@ -96,5 +97,18 @@ public class ExpenseManager {
             }
         }
         return returnMap;
+    }
+    public Expense getExpenseByName(String expenseName) {
+        for (Expense expense : expenseList) {
+            if (expense.getTitle().equalsIgnoreCase(expenseName)) {
+                return expense;
+            }
+        }
+        return null;
+    }
+    public List<Expense> searchByName(String name) {
+        return expenseList.stream()
+                .filter(e -> e.getTitle().toLowerCase().contains(name.toLowerCase()))
+                .collect(Collectors.toList());
     }
 }
