@@ -4,6 +4,8 @@ import CategoryOfThisMonthPieChart from "./CategoryOfThisMonthPieChart.jsx";
 
 export default function ManageExpenses() {
     const [expenses, setExpenses] = useState([]);
+    const [search, setSearch] = useState("");
+
 
     useEffect(() => {
         API.get("/expenses")
@@ -26,12 +28,34 @@ export default function ManageExpenses() {
         }
     };
 
+    const handleSearch = (e) => {
+        const value = e.target.value;
+        setSearch(value);
+
+        if (value.trim() === "") {
+            API.get("/expenses").then(res => {setExpenses(res.data)});
+        }
+        else
+        {
+            API.get(`/expenses/search?name=${value}`)
+                .then(res => {setExpenses(res.data)})
+            .catch(err => console.error(err));
+        }
+    }
+
     return (
 
         <div>
-            <h1>Manage Expenses</h1>
-            <h2>This month's expenses:</h2>
+            <h1 style={{ color: "#378ADD" }}>Manage Expenses</h1>
+            <h2 style={{ color: "#378ADD" }}>This month's expenses:</h2>
             <CategoryOfThisMonthPieChart />
+
+            <input
+                placeholder="Search for expense"
+                value={search}
+                onChange={handleSearch}
+                style={{ padding: "10px", borderRadius: "8px", border: "1px solid #378ADD", background: "#1e1e1e", color: "white", width: "100%", marginBottom: "12px" }}
+            />
 
             {expenses.length === 0 && <p style={{ color: "#888" }}>No expenses yet.</p>}
             {expenses.map(exp => (
@@ -50,7 +74,7 @@ export default function ManageExpenses() {
                         <p style={{ margin: 0, fontSize: "12px", color: "#888" }}>{exp.category} · {exp.date}</p>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                        <span style={{ fontWeight: "600", fontSize: "16px", color: "#e05a5a" }}>-${exp.amount}</span>
+                        <span style={{ fontWeight: "600", fontSize: "16px", color: "#e05a5a" }}>-€{exp.amount}</span>
                         <button onClick={() => deleteExpense(exp.id)} style={{
                             background: "none",
                             border: "1px solid #555",

@@ -23,7 +23,7 @@ export default function CategoryOfThisMonthPieChart() {
             });
     }, [])
     return (
-        <PieChart width={450} height={450}>
+        <PieChart width={600} height={450}>
             <Pie
                 data = {expenses}
                 dataKey="value"

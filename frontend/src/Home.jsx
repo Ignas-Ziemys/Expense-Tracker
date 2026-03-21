@@ -25,6 +25,11 @@ export default function Home() {
             return;
         }
 
+        if (!date) {
+            alert("Please select a date");
+            return;
+        }
+
         const numberAmount = parseFloat(amount);
         if (numberAmount < 0) {
             alert("Amount must be greater than 0");
@@ -44,17 +49,11 @@ export default function Home() {
             .catch(err => console.error(err));
     };
 
-    const deleteExpense = (id) => {
-        API.delete(`/expenses/${id}`)
-            .then(() => setExpenses(prev => prev.filter(e => e.id !== id)))
-            .catch(err => console.error(err));
-    };
-
     return (
         <div>
-            <h1>Expense Tracker</h1>
+            <h1 style={{ color: "#378ADD" }}> Expense Tracker</h1>
 
-            <h2>Recent Expenses</h2>
+            <h2 style={{ color: "#378ADD" }}> Recent Expenses</h2>
             {expenses.length === 0 && <p style={{ color: "#888" }}>No expenses yet.</p>}
             {expenses.map(exp => (
                 <div key={exp.id} style={{
@@ -71,7 +70,7 @@ export default function Home() {
                         <p style={{ margin: 0, fontWeight: "500", fontSize: "15px", color: "white" }}>{exp.title}</p>
                         <p style={{ margin: 0, fontSize: "12px", color: "#888" }}>{exp.category} · {exp.date}</p>
                     </div>
-                    <span style={{ fontWeight: "600", fontSize: "16px", color: "#e05a5a" }}>-${exp.amount}</span>
+                    <span style={{ fontWeight: "600", fontSize: "16px", color: "#e05a5a" }}>-€{exp.amount}</span>
                 </div>
             ))}
 
@@ -91,13 +90,18 @@ export default function Home() {
                     <option value="ENTERTAINMENT">Entertainment</option>
                     <option value="OTHER">Other</option>
                 </select>
-                <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                       style={{ padding: "10px", borderRadius: "8px", border: "1px solid #444", background: "#1e1e1e", color: "white" }} />
+                <input
+                    type="date"
+                    value={date}
+                    onChange={e => setDate(e.target.value)}
+                    style={{ padding: "10px", borderRadius: "8px", border: "1px solid #444", background: "#1e1e1e", color: "white", width: "100%" }}
+                />
+
                 <button onClick={addExpense} style={{
                     padding: "10px",
                     borderRadius: "8px",
                     border: "none",
-                    backgroundColor: "#7F77DD",
+                    backgroundColor: "#378ADD",
                     color: "white",
                     fontWeight: "600",
                     cursor: "pointer",
