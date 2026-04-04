@@ -1,7 +1,7 @@
 package com.example.expense_tracker.service;
 
+import com.example.expense_tracker.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
-import com.example.expense_tracker.util.FileHandler;
 import com.example.expense_tracker.model.Category;
 import com.example.expense_tracker.model.Expense;
 
@@ -11,107 +11,72 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class ExpenseManager {
     private List<Expense> expenseList = new ArrayList<>();
-    private FileHandler fileHandler;
-    private long nextId = 1;
+    private ExpenseRepository expenseRepository;
 
-    public ExpenseManager(FileHandler fileHandler) {
-        this.fileHandler = fileHandler;
-        List<Expense> loaded = fileHandler.readExpenses();
-        this.expenseList = loaded != null ? loaded : new ArrayList<>();
-
-        for (Expense e : expenseList) {
-            nextId = Math.max(nextId, e.getId() + 1);
-        }
+    public ExpenseManager(ExpenseRepository expenseRepository) {
+        this.expenseRepository = expenseRepository;
     }
+
     public Expense addExpense(Expense expense) {
-        expense.setId(nextId++);
-        expenseList.add(expense);
-        fileHandler.saveExpenses(expenseList);
-        return expense;
+        return expenseRepository.save(expense);
     }
     public boolean removeExpense(Long id) {
-        boolean result = false;
-        for (Expense expense : expenseList) {
-            if (expense.getId() == id) {
-                expenseList.remove(expense);
-                result = true;
-            }
+        if (expenseRepository.existsById(id)) {
+            expenseRepository.deleteById(id);
+            return true;
         }
-        if (result) {
-            fileHandler.saveExpenses(expenseList);
-        }
-        return result;
+        return false;
     }
     public Expense editExpense(Long id, double amount, Category category, LocalDate date, String title) {
-        boolean result = false;
-        for (Expense expense : expenseList) {
-            if (expense.getId() == id) {
-                expense.setId(id);
-                expense.setAmount(amount);
-                expense.setCategory(category);
-                expense.setTitle(title);
-                expense.setDate(date);
-                fileHandler.saveExpenses(expenseList);
-                return expense;
-            }
-        }
-        return null;
+        return expenseRepository.findById(id).map(expense -> {
+            expense.setAmount(amount);
+            expense.setCategory(category);
+            expense.setDate(date);
+            expense.setTitle(title);
+            return expenseRepository.save(expense);
+        }).orElseThrow(() -> new RuntimeException("Expense with id " + id + " not found"));
     }
     public List<Expense> getAllExpenses() {
-        List<Expense> returnList = new ArrayList<>();
-        for (Expense expense : expenseList) {
-            returnList.add(expense);
-        }
-        return returnList;
+        return expenseRepository.findAll();
     }
     public List<Expense> getExpenseBYCategory(Category category) {
-        List<Expense> returnList = new ArrayList<>();
-        for (Expense expense : expenseList) {
-            if (expense.getCategory() == category) {
-                returnList.add(expense);
-            }
-        }
-        return returnList;
-    }
-    public List<Expense> getExpensesByMonth(YearMonth month) {
-        List<Expense> returnList = new ArrayList<>();
-        for (Expense expense : expenseList) {
-            if (YearMonth.from(expense.getDate()).equals(month)) {
-                returnList.add(expense);
-            }
-        }
-        return returnList;
+        return expenseRepository.findByCategory(category);
     }
     public List<Expense> getExpensesByMonth(int year, int month) {
-        YearMonth ym = YearMonth.of(year, month);
-        return getExpensesByMonth(ym);
+        return expenseRepository.findByYearAndMonth(year, month);
     }
     public Map<Category, Double> summary(YearMonth month) {
-        Map<Category, Double> returnMap = new HashMap<>();
-        for (Expense expense : expenseList) {
-            if (YearMonth.from(expense.getDate()).equals(month))
-            {
-                returnMap.put(expense.getCategory(),  returnMap.getOrDefault(expense.getCategory(), 0.0) + expense.getAmount());
-            }
+        List<Expense> expenses = expenseRepository.findByYearAndMonth(month.getYear(), month.getMonthValue());
+        Map<Category, Double> map = new HashMap<>();
+        for (Expense expense : expenses) {
+            map.put(expense.getCategory(), map.getOrDefault(expense.getCategory(), 0.0) + expense.getAmount());
         }
-        return returnMap;
+        return map;
     }
     public Expense getExpenseByName(String expenseName) {
-        for (Expense expense : expenseList) {
-            if (expense.getTitle().equalsIgnoreCase(expenseName)) {
-                return expense;
-            }
-        }
-        return null;
+        return expenseRepository.findByTitleContainingIgnoreCase(expenseName).stream().findFirst().orElse(null);
     }
     public List<Expense> searchByName(String name) {
-        return expenseList.stream()
-                .filter(e -> e.getTitle().toLowerCase().contains(name.toLowerCase()))
-                .collect(Collectors.toList());
+        return expenseRepository.findByTitleContainingIgnoreCase(name);
+    }
+    public double totalSpentThisMonth() {
+        List<Expense> expenses = expenseRepository.findByYearAndMonth(YearMonth.now().getYear(), YearMonth.now().getMonthValue());
+        double total = 0.0;
+        for  (Expense expense : expenses) {
+            total += expense.getAmount();
+        }
+        return total;
+    }
+    public double averagePerDay() {
+        List<Expense> expenses = expenseRepository.findByYearAndMonth(YearMonth.now().getYear(), YearMonth.now().getMonthValue());
+        double total = 0.0;
+        for  (Expense expense : expenses) {
+            total += expense.getAmount();
+        }
+        return Math.round(total / YearMonth.now().lengthOfMonth() * 100.0) / 100.0;
     }
 }
