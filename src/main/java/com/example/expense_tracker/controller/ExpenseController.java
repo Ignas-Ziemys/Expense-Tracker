@@ -62,5 +62,12 @@ public class ExpenseController {
     public Expense updateExpense(@PathVariable Long id, @Valid @RequestBody Expense expense) {
         return expenseManager.editExpense(id, expense.getAmount(), expense.getCategory(), expense.getDate(), expense.getTitle());
     }
-
+    @GetMapping("/spent-this-month")
+    public double getSpentThisMonth() {
+        return expenseManager.totalSpentThisMonth();
+    }
+    @GetMapping("/avarage-per-day")
+    public double getAveragePerDay() {
+        return expenseManager.averagePerDay();
+    }
 }

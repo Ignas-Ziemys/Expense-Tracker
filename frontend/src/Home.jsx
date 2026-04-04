@@ -36,7 +36,7 @@ export default function Home() {
             return;
         }
 
-        const newExpense = { id: Date.now(), title, amount: Number(amount), category, date };
+        const newExpense = { title, amount: Number(amount), category, date };
 
         API.post("/expenses", newExpense)
             .then(res => {

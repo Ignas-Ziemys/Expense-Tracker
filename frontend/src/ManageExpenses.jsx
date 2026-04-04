@@ -10,6 +10,8 @@ export default function ManageExpenses() {
     const [newAmount, setNewAmount] = useState("");
     const [newCategory, setNewCategory] = useState("FOOD");
     const [newDate, setNewDate] = useState("");
+    const [totalSpent, setTotalSpent] = useState(0);
+    const [averageSpent, setAverageSpent] = useState(0);
 
 
     useEffect(() => {
@@ -20,6 +22,14 @@ export default function ManageExpenses() {
             })
             .catch(err => console.error(err));
     }, []);
+
+    useEffect(() => {
+        API.get("/expenses/spent-this-month").then(res => {setTotalSpent(res.data)}).catch(err => console.error(err));
+    }, []);
+
+    useEffect(() => {
+        API.get("/expenses/avarage-per-day").then(res => {setAverageSpent(res.data)}).catch(err => console.error(err));
+    },[]);
 
     const deleteExpense = async(id) => {
         const confirmed = window.confirm("Delete this expense?");
@@ -56,7 +66,7 @@ export default function ManageExpenses() {
                 category: newCategory,
                 date: newDate
             };
-            console.log("Sending:", updatedExpense); // add this
+            console.log("Sending:", updatedExpense);
             await API.put(`/expenses/${id}`, updatedExpense);
             setExpenses(prev => prev.map(e => e.id === id ? { ...e, ...updatedExpense } : e));
             setEditingId(null);
@@ -71,7 +81,8 @@ export default function ManageExpenses() {
             <h1 style={{ color: "#378ADD" }}>Manage Expenses</h1>
             <h2 style={{ color: "#378ADD" }}>This month's expenses:</h2>
             <CategoryOfThisMonthPieChart />
-
+            <p style={{ margin:"16px 0", fontWeight: "500", fontSize: "18px", color: "white", textAlign: "center" }}>Total spent this month: {totalSpent}€</p>
+            <p style={{ margin:"16px 0", fontWeight: "500", fontSize: "18px", color: "white", textAlign: "center" }}>Average spent per day: {averageSpent}€</p>
             <input
                 placeholder="Search for expense"
                 value={search}
