@@ -45,8 +45,8 @@ public class Expense {
     public double getAmount() {
         return amount;
     }
-    public void setAmount(double ammount) {
-        this.amount = ammount;
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
     public Category getCategory() {
         return category;
