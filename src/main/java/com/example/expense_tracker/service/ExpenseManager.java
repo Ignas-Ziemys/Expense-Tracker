@@ -38,7 +38,7 @@ public class ExpenseManager {
             expense.setDate(date);
             expense.setTitle(title);
             return expenseRepository.save(expense);
-        }).orElse(null);
+        }).orElseThrow(() -> new RuntimeException("Expense with id " + id + " not found"));
     }
     public List<Expense> getAllExpenses() {
         return expenseRepository.findAll();
