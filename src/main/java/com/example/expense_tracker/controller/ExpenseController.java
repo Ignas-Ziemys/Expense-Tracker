@@ -6,6 +6,7 @@ import com.example.expense_tracker.service.ExpenseManager;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -69,5 +70,9 @@ public class ExpenseController {
     @GetMapping("/avarage-per-day")
     public double getAveragePerDay() {
         return expenseManager.averagePerDay();
+    }
+    @GetMapping("/filter")
+    public List<Expense> getFilterByDate(@RequestParam("start") LocalDate startDate, @RequestParam("end") LocalDate endDate) {
+        return expenseManager.filterByDate(startDate, endDate);
     }
 }
