@@ -1,21 +1,23 @@
 import { useEffect, useState } from "react";
 import API from "./api";
 
+const RECENT_COUNT = 5;
+
+const sortByDateDesc = (items) => [...items].sort((a, b) => new Date(b.date) - new Date(a.date));
+
 export default function Home() {
     const [expenses, setExpenses] = useState([]);
     const [title, setTitle] = useState("");
     const [amount, setAmount] = useState("");
     const [category, setCategory] = useState("FOOD");
     const [date, setDate] = useState("");
-    const rescentCount = 5;
 
     useEffect(() => {
         API.get("/expenses")
-            .then(res => {
-                const sorted = res.data.sort((a, b) => new Date(b.date) - new Date(a.date));
-                setExpenses(sorted.slice(0, rescentCount));
+            .then((res) => {
+                setExpenses(sortByDateDesc(res.data).slice(0, RECENT_COUNT));
             })
-            .catch(err => console.error(err));
+            .catch((err) => console.error(err));
     }, []);
 
     const addExpense = () => {
@@ -39,75 +41,80 @@ export default function Home() {
         const newExpense = { title, amount: Number(amount), category, date };
 
         API.post("/expenses", newExpense)
-            .then(res => {
-                setExpenses(prev => [res.data, ...prev].slice(0, rescentCount));
+            .then((res) => {
+                setExpenses((prev) => [res.data, ...prev].slice(0, RECENT_COUNT));
                 setTitle("");
                 setAmount("");
                 setCategory("FOOD");
                 setDate("");
             })
-            .catch(err => console.error(err));
+            .catch((err) => console.error(err));
     };
 
     return (
-        <div>
-            <h1 style={{ color: "#378ADD" }}> Expense Tracker</h1>
+        <div className="page-wrap">
+            <section className="section-header">
+                <h1 className="page-title">Expense Tracker</h1>
+                <p className="page-subtitle">Track spending with clarity and keep your budget in control.</p>
+            </section>
 
-            <h2 style={{ color: "#378ADD" }}> Recent Expenses</h2>
-            {expenses.length === 0 && <p style={{ color: "#888" }}>No expenses yet.</p>}
-            {expenses.map(exp => (
-                <div key={exp.id} style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: "12px 16px",
-                    marginBottom: "8px",
-                    borderRadius: "10px",
-                    backgroundColor: "#1e1e1e",
-                    border: "1px solid #333"
-                }}>
-                    <div>
-                        <p style={{ margin: 0, fontWeight: "500", fontSize: "15px", color: "white" }}>{exp.title}</p>
-                        <p style={{ margin: 0, fontSize: "12px", color: "#888" }}>{exp.category} · {exp.date}</p>
-                    </div>
-                    <span style={{ fontWeight: "600", fontSize: "16px", color: "#e05a5a" }}>-€{exp.amount}</span>
+            <section className="surface-card">
+                <div className="card-heading-row">
+                    <h2 className="section-title">Recent Expenses</h2>
+                    <span className="tag-pill">Last {RECENT_COUNT}</span>
                 </div>
-            ))}
 
-            <h3 style={{ marginTop: "24px" }}>Add Expense</h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                <input placeholder="Title" value={title} onChange={e => setTitle(e.target.value)}
-                       style={{ padding: "10px", borderRadius: "8px", border: "1px solid #444", background: "#1e1e1e", color: "white" }} />
-                <input type="number" placeholder="Amount" value={amount} onChange={e => setAmount(e.target.value)}
-                       style={{ padding: "10px", borderRadius: "8px", border: "1px solid #444", background: "#1e1e1e", color: "white" }} />
-                <select value={category} onChange={e => setCategory(e.target.value)}
-                        style={{ padding: "10px", borderRadius: "8px", border: "1px solid #444", background: "#1e1e1e", color: "white" }}>
-                    <option value="FOOD">Food</option>
-                    <option value="TRAVEL">Travel</option>
-                    <option value="RENT">Rent</option>
-                    <option value="SHOPPING">Shopping</option>
-                    <option value="UTILITIES">Utilities</option>
-                    <option value="ENTERTAINMENT">Entertainment</option>
-                    <option value="OTHER">Other</option>
-                </select>
-                <input
-                    type="date"
-                    value={date}
-                    onChange={e => setDate(e.target.value)}
-                    style={{ padding: "10px", borderRadius: "8px", border: "1px solid #444", background: "#1e1e1e", color: "white", width: "100%" }}
-                />
+                {expenses.length === 0 && <p className="empty-note">No expenses yet.</p>}
 
-                <button onClick={addExpense} style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "none",
-                    backgroundColor: "#378ADD",
-                    color: "white",
-                    fontWeight: "600",
-                    cursor: "pointer",
-                    fontSize: "15px"
-                }}>Add Expense</button>
-            </div>
+                <div className="expense-list">
+                    {expenses.map((exp) => (
+                        <div key={exp.id} className="expense-item">
+                            <div>
+                                <p className="expense-title">{exp.title}</p>
+                                <p className="expense-meta">{exp.category} · {exp.date}</p>
+                            </div>
+                            <span className="expense-amount">{exp.amount}€</span>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            <section className="surface-card">
+                <h3 className="section-title">Add Expense</h3>
+
+                <div className="form-grid">
+                    <input
+                        className="input-control"
+                        placeholder="Title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
+                    <input
+                        className="input-control"
+                        type="number"
+                        placeholder="Amount"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                    />
+                    <select className="input-control" value={category} onChange={(e) => setCategory(e.target.value)}>
+                        <option value="FOOD">Food</option>
+                        <option value="TRAVEL">Travel</option>
+                        <option value="RENT">Rent</option>
+                        <option value="SHOPPING">Shopping</option>
+                        <option value="UTILITIES">Utilities</option>
+                        <option value="ENTERTAINMENT">Entertainment</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                    <input
+                        className="input-control"
+                        type="date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                    />
+
+                    <button className="btn-primary" onClick={addExpense}>Add Expense</button>
+                </div>
+            </section>
         </div>
     );
 }

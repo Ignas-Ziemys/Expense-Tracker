@@ -79,4 +79,14 @@ public class ExpenseManager {
         }
         return Math.round(total / YearMonth.now().lengthOfMonth() * 100.0) / 100.0;
     }
+    public List<Expense> filterByDate(LocalDate startDate,  LocalDate endDate) {
+        List<Expense> expenses = expenseRepository.findAll();
+        List<Expense> filteredExpenses = new ArrayList<>();
+        for (Expense expense : expenses) {
+            if (!expense.getDate().isBefore(startDate) && !expense.getDate().isAfter(endDate)) {
+                filteredExpenses.add(expense);
+            }
+        }
+        return filteredExpenses;
+    }
 }
