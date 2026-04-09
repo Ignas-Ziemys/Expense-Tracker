@@ -1,5 +1,7 @@
 package com.example.expense_tracker.service;
 
+import com.example.expense_tracker.model.Budget;
+import com.example.expense_tracker.repository.BudgetRepository;
 import com.example.expense_tracker.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
 import com.example.expense_tracker.model.Category;
@@ -16,9 +18,11 @@ import java.util.Map;
 public class ExpenseManager {
     private List<Expense> expenseList = new ArrayList<>();
     private ExpenseRepository expenseRepository;
+    private BudgetRepository budgetRepository;
 
-    public ExpenseManager(ExpenseRepository expenseRepository) {
+    public ExpenseManager(ExpenseRepository expenseRepository,  BudgetRepository budgetRepository) {
         this.expenseRepository = expenseRepository;
+        this.budgetRepository = budgetRepository;
     }
 
     public Expense addExpense(Expense expense) {
@@ -88,5 +92,38 @@ public class ExpenseManager {
             }
         }
         return filteredExpenses;
+    }
+    public Category getMostExpenseCategory() {
+        Map<Category, Double> summary = summary(YearMonth.now());
+        Category mostExpenseCategory = null;
+        double max = 0.0;
+        for (Map.Entry<Category, Double> entry : summary.entrySet()) {
+            if (entry.getValue() > max) {
+                max = entry.getValue();
+                mostExpenseCategory = entry.getKey();
+            }
+        }
+        return mostExpenseCategory;
+    }
+    public List<Expense> filteredByAmount() {
+        return expenseRepository.findAllByOrderByAmountDesc();
+    }
+    public void updateBudget(double limit)
+    {
+        Budget budget = budgetRepository.findById(1L).orElse(new Budget());
+        budget.setMonthlyLimit(limit);
+        budgetRepository.save(budget);
+    }
+    public double getBudget() {
+        return budgetRepository.findById(1L)
+                .map(Budget::getMonthlyLimit)
+                .orElse(0.0);
+    }
+    public boolean isOverBudget()
+    {
+        double budget = getBudget();
+        double totalSpent = totalSpentThisMonth();
+        if (budget <= 0) return false;
+        return totalSpent > budget;
     }
 }

@@ -17,12 +17,31 @@ export default function ManageExpenses() {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [showFilter, setShowFilter] = useState(false);
+    const [mostExpensiveCategory, setMostExpensiveCategory] = useState("");
+    const [isSorted, setIsSorted] = useState(false);
+    const [budget, setBudget] = useState(0);
+    const [isOver, setIsOver] = useState(false);
 
     const fetchAllExpenses = () => {
         API.get("/expenses")
             .then((res) => setExpenses(sortByDateDesc(res.data)))
             .catch((err) => console.error(err));
     };
+
+    const fetchBudgetData = async () => {
+        try {
+            const response = await API.get("/budget/info");
+
+            setBudget(response.data.limit);
+            setIsOver(response.data.isOver);
+        } catch (error) {
+            console.error("Error fetching budget:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchBudgetData();
+    }, []);
 
     useEffect(() => {
         fetchAllExpenses();
@@ -32,6 +51,12 @@ export default function ManageExpenses() {
         API.get("/expenses/spent-this-month")
             .then((res) => setTotalSpent(res.data))
             .catch((err) => console.error(err));
+    }, []);
+
+    useEffect(() => {
+        API.get("/expenses/most-expensive-category")
+            .then((res) => setMostExpensiveCategory(res.data))
+            .catch((err) => console.error(err))
     }, []);
 
     useEffect(() => {
@@ -95,10 +120,40 @@ export default function ManageExpenses() {
             .catch((err) => console.error(err));
     };
 
+    const handleSortByAmount = async () => {
+        try {
+            if (isSorted)
+            {
+                const response = await API.get("/expenses");
+                setExpenses(response.data);
+                setIsSorted(false);
+            }
+            else
+            {
+                const response = await API.get("/expenses/sort-by-ammount");
+                setExpenses(response.data);
+                setIsSorted(true);
+            }
+        }
+        catch(error)
+        {
+            console.error("Error sorting", error)
+        }
+    };
+
     const clearFilter = () => {
         setStartDate("");
         setEndDate("");
         fetchAllExpenses();
+    };
+
+    const handleBudget = async () => {
+        const newLimit = window.prompt("Enter your monthly budget limit:");
+        if (newLimit)
+        {
+            await API.post(`/budget/${newLimit}`);
+            fetchBudgetData();
+        }
     };
 
     const updateExpense = async (id) => {
@@ -122,11 +177,14 @@ export default function ManageExpenses() {
         <div className="page-wrap">
             <section className="section-header">
                 <h1 className="page-title">Manage Expenses</h1>
-                <p className="page-subtitle">Inspect trends, search records, and fine-tune each expense entry.</p>
             </section>
 
             <section className="surface-card">
-                <h2 className="section-title">This Month Overview</h2>
+                <div className="card-heading-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h2 className="section-title">This Month Overview</h2>
+                    <button className="btn-ghost" onClick={handleBudget}> Set monthly budget </button>
+                </div>
+                <h2 className="section-title">Most expensive category this month: <span style={{ color: 'red' }}>{mostExpensiveCategory}</span></h2>
                 <div className="chart-shell">
                     <CategoryOfThisMonthPieChart />
                 </div>
@@ -140,15 +198,23 @@ export default function ManageExpenses() {
                         <p className="stat-label">Average per day</p>
                         <p className="stat-value">€ {averageSpent}</p>
                     </div>
+                    <div>
+                        <p className="stat-label">This month's budget</p>
+                        <p className="stat-value">€ {budget}</p>
+                        {totalSpent > budget && <p className="warning">⚠️ You are over budget!</p>}
+                    </div>
                 </div>
             </section>
 
             <section className="surface-card">
                 <div className="card-heading-row">
                     <h2 className="section-title">Expense Records</h2>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                    <button className="btn-ghost" onClick={handleSortByAmount}> {isSorted ? "Reset order" : "Sort by amount"} </button>
                     <button className="btn-ghost" onClick={() => setShowFilter(!showFilter)}>
                         {showFilter ? "Hide Filters" : "Filter by Date"}
                     </button>
+                    </div>
                 </div>
 
                 <input
