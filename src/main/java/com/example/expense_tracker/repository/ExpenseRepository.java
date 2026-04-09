@@ -15,4 +15,5 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     @Query("SELECT e FROM Expense e WHERE YEAR(e.date) = :year AND MONTH(e.date) = :month")
     List<Expense> findByYearAndMonth(@Param("year") int year, @Param("month") int month);
     List<Expense> findByCategory(Category category);
+    List<Expense> findAllByOrderByAmountDesc();
 }

@@ -55,7 +55,6 @@ export default function Home() {
         <div className="page-wrap">
             <section className="section-header">
                 <h1 className="page-title">Expense Tracker</h1>
-                <p className="page-subtitle">Track spending with clarity and keep your budget in control.</p>
             </section>
 
             <section className="surface-card">

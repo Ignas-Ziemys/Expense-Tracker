@@ -75,4 +75,12 @@ public class ExpenseController {
     public List<Expense> getFilterByDate(@RequestParam("start") LocalDate startDate, @RequestParam("end") LocalDate endDate) {
         return expenseManager.filterByDate(startDate, endDate);
     }
+    @GetMapping("most-expensive-category")
+    public Category  getMostExpensiveCategory() {
+        return expenseManager.getMostExpenseCategory();
+    }
+    @GetMapping("sort-by-ammount")
+    public List<Expense> sortByAmountDesc() {
+        return expenseManager.filteredByAmount();
+    }
 }
