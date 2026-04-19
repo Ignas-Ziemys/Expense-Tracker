@@ -20,7 +20,7 @@ export default function ManageExpenses() {
     const [mostExpensiveCategory, setMostExpensiveCategory] = useState("");
     const [isSorted, setIsSorted] = useState(false);
     const [budget, setBudget] = useState(0);
-    const [isOver, setIsOver] = useState(false);
+    const [isOverBudget, setIsOverBudget] = useState(false);
 
     const fetchAllExpenses = () => {
         API.get("/expenses")
@@ -31,16 +31,20 @@ export default function ManageExpenses() {
     const fetchBudgetData = async () => {
         try {
             const response = await API.get("/budget/info");
-
             setBudget(response.data.limit);
-            setIsOver(response.data.isOver);
+            setIsOverBudget(response.data.isOver);
         } catch (error) {
             console.error("Error fetching budget:", error);
         }
     };
 
     useEffect(() => {
-        fetchBudgetData();
+        API.get("/budget/info")
+            .then((response) => {
+                setBudget(response.data.limit);
+                setIsOverBudget(response.data.isOver);
+            })
+            .catch((error) => console.error("Error fetching budget:", error));
     }, []);
 
     useEffect(() => {
@@ -201,7 +205,7 @@ export default function ManageExpenses() {
                     <div>
                         <p className="stat-label">This month's budget</p>
                         <p className="stat-value">€ {budget}</p>
-                        {totalSpent > budget && <p className="warning">⚠️ You are over budget!</p>}
+                        {isOverBudget && <p className="warning">⚠️ You are over budget!</p>}
                     </div>
                 </div>
             </section>
