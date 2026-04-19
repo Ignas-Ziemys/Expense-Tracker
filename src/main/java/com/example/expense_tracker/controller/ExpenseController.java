@@ -4,6 +4,7 @@ import com.example.expense_tracker.model.Category;
 import com.example.expense_tracker.model.Expense;
 import com.example.expense_tracker.service.ExpenseManager;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -20,27 +21,34 @@ public class ExpenseController {
         this.expenseManager = expenseManager;
     }
 
+    private String getCurrentUserEmail(Authentication authentication)
+    {
+        return authentication.getName();
+    }
+
     @GetMapping
-    public List<Expense> getAllExpenses() {
-        return expenseManager.getAllExpenses();
+    public List<Expense> getAllExpenses(Authentication authentication) {
+        return expenseManager.getAllExpenses(getCurrentUserEmail(authentication));
     }
 
     @PostMapping
-    public Expense addExpense(@Valid @RequestBody Expense expense) {
+    public Expense addExpense(Authentication authentication, @Valid @RequestBody Expense expense) {
         System.out.println("Received expense: " + expense.getTitle());
         System.out.println(expense);
-        return expenseManager.addExpense(expense);
+        return expenseManager.addExpense(expense, getCurrentUserEmail(authentication));
     }
+
     @DeleteMapping("/{id}")
-    public void deleteExpense(@PathVariable long id) {
-        expenseManager.removeExpense(id);
+    public void deleteExpense(Authentication authentication, @PathVariable long id) {
+        expenseManager.removeExpense(id, getCurrentUserEmail(authentication));
     }
 
     @GetMapping("/by-month")
-    public List<Expense> getExpensesByMonth(@RequestParam(required = false) String category) {
+    public List<Expense> getExpensesByMonth(Authentication authentication, @RequestParam(required = false) String category) {
         List<Expense> expenses = expenseManager.getExpensesByMonth(
                 YearMonth.now().getYear(),
-                YearMonth.now().getMonthValue()
+                YearMonth.now().getMonthValue(),
+                getCurrentUserEmail(authentication)
         );
 
         if (category != null) {
@@ -51,36 +59,44 @@ public class ExpenseController {
 
         return expenses;
     }
+
     @GetMapping("/expenses/category/{category}")
-    public List<Expense> getExpensesByCategory(@PathVariable Category category) {
-        return expenseManager.getExpenseBYCategory(category);
+    public List<Expense> getExpensesByCategory(Authentication authentication, @PathVariable Category category) {
+        return expenseManager.getExpenseBYCategory(category, getCurrentUserEmail(authentication));
     }
+
     @GetMapping("/search")
-    public List<Expense> searchExpenses(@RequestParam String name) {
-        return expenseManager.searchByName(name);
+    public List<Expense> searchExpenses(Authentication authentication, @RequestParam String name) {
+        return expenseManager.searchByName(name, getCurrentUserEmail(authentication));
     }
+
     @PutMapping("/{id}")
-    public Expense updateExpense(@PathVariable Long id, @Valid @RequestBody Expense expense) {
-        return expenseManager.editExpense(id, expense.getAmount(), expense.getCategory(), expense.getDate(), expense.getTitle());
+    public Expense updateExpense(Authentication authentication, @PathVariable Long id, @Valid @RequestBody Expense expense) {
+        return expenseManager.editExpense(id, expense.getAmount(), expense.getCategory(), expense.getDate(), expense.getTitle(), getCurrentUserEmail(authentication));
     }
+
     @GetMapping("/spent-this-month")
-    public double getSpentThisMonth() {
-        return expenseManager.totalSpentThisMonth();
+    public double getSpentThisMonth(Authentication authentication) {
+        return expenseManager.totalSpentThisMonth(getCurrentUserEmail(authentication));
     }
+
     @GetMapping("/avarage-per-day")
-    public double getAveragePerDay() {
-        return expenseManager.averagePerDay();
+    public double getAveragePerDay(Authentication authentication) {
+        return expenseManager.averagePerDay(getCurrentUserEmail(authentication));
     }
+
     @GetMapping("/filter")
-    public List<Expense> getFilterByDate(@RequestParam("start") LocalDate startDate, @RequestParam("end") LocalDate endDate) {
-        return expenseManager.filterByDate(startDate, endDate);
+    public List<Expense> getFilterByDate(Authentication authentication, @RequestParam("start") LocalDate startDate, @RequestParam("end") LocalDate endDate) {
+        return expenseManager.filterByDate(startDate, endDate, getCurrentUserEmail(authentication));
     }
+
     @GetMapping("most-expensive-category")
-    public Category  getMostExpensiveCategory() {
-        return expenseManager.getMostExpenseCategory();
+    public Category  getMostExpensiveCategory(Authentication authentication) {
+        return expenseManager.getMostExpenseCategory(getCurrentUserEmail(authentication));
     }
+
     @GetMapping("sort-by-ammount")
-    public List<Expense> sortByAmountDesc() {
-        return expenseManager.filteredByAmount();
+    public List<Expense> sortByAmountDesc(Authentication authentication) {
+        return expenseManager.filteredByAmount(getCurrentUserEmail(authentication));
     }
 }

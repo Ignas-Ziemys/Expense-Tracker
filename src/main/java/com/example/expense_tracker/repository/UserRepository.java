@@ -1,13 +1,13 @@
 package com.example.expense_tracker.repository;
 
-import com.example.expense_tracker.model.Budget;
+import com.example.expense_tracker.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-
 @Repository
-public interface BudgetRepository extends JpaRepository<Budget, Long> {
-	Optional<Budget> findFirstByUserEmail(String email);
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByEmail(String email);
+    boolean existsByEmail(String email);
 }
