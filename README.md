@@ -14,6 +14,45 @@ A full-stack expense tracking application built with **Spring Boot** (backend) a
 - Data persistence via PostgreSQL (H2 for quick setup)
 - REST API backend with input validation and global error handling
 
+
+<h1 align="center">Expense Tracker - Application Showcase</h1>
+
+<p align="center">
+  A visual tour of the user interface. Keep track of your spending.
+</p>
+
+<hr>
+
+### 📊 Dashboard & Overview
+*Your Financial Hub: View total monthly spend, average daily spend, and a category breakdown pie chart.*
+<p align="center">
+  <img src="screenshots/dashboard_url.png" width="800" alt="Dashboard Overview" />
+</p>
+
+### 📋 Expense Records
+*Manage Records: View a complete list of your expenses with convenient edit and delete options.*
+<p align="center">
+  <img src="screenshots/records_url.png" width="800" alt="Expense Records" />
+</p>
+
+### 📅 Filtering & Navigation
+*Data Navigation: Easily filter your records by selecting a specific date range using the interactive calendar.*
+<p align="center">
+  <img src="screenshots/select_month_url.png" width="800" alt="Date Range Selection" />
+</p>
+
+### ➕ Adding Expenses
+*Record New Spending: Quickly add new expenses with precise details and category selection.*
+<p align="center">
+  <img src="screenshots/add_expense_url.png" width="800" alt="Add Expense Form" />
+</p>
+
+### 🔒 Secure Access
+*Secure Login: A private and protected entry point to manage your sensitive financial data.*
+<p align="center">
+  <img src="screenshots/login_url.png" width="800" alt="Login Page" />
+</p>
+
 ## Tech Stack
 
 **Backend**
